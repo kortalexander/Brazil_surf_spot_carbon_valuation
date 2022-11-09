@@ -1,0 +1,32 @@
+---
+title: "Brazil surf spot carbon valuation"
+author: "Kort Alexander"
+date: "2022-11-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+all_spots <- read_csv(here("data", "all_spots.csv")) %>% 
+  clean_names()
+ws_plus_sl <- read_csv(here("data", "ws_plus_sl.csv")) %>% 
+  clean_names()
+```
+
+```{r}
+SCC_2.5 <- 65
+SCC_3 <- 44
+SCC_5 <- 13
+all_spots <- all_spots %>% 
+  mutate(initial_value_10km_2.5 = sum_10km * SCC_2.5) %>% 
+  mutate(initial_value_10km_3 = sum_10km * SCC_3) %>% 
+  mutate(initial_value_10km_5 = sum_10km * SCC_5)
+```
+
