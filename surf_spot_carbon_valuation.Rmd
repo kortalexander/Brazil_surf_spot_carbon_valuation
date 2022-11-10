@@ -107,3 +107,27 @@ ws_plus_sl <- ws_plus_sl %>%
   mutate(seq_value_2050_5_1km = seq_value(annual_seq_1km, 0.05, 27))
 ```
 
+# Combining lat and long into two columns
+
+```{r}
+all_spots <- all_spots %>% 
+  mutate(new_lat = case_when(!is.null(lat) & lat != 0 ~ lat,
+                             wannasurf != 0 ~ wannasurf,
+                             manually_a != 0 ~ manually_a)) %>% 
+  mutate(new_long = case_when(!is.null(lon) & lon != 0 ~ lon,
+                              wannasurf1 != 0 ~ wannasurf1,
+                              manually_1 != 0 ~ manually_1))
+ws_plus_sl <- ws_plus_sl %>% 
+  mutate(new_lat = case_when(!is.null(lat) & lat != 0 ~ lat,
+                             wannasurf != 0 ~ wannasurf)) %>% 
+  mutate(new_long = case_when(!is.null(lon) & lon != 0 ~ lon,
+                              wannasurf1 != 0 ~ wannasurf1))
+```
+
+# Plots
+
+```{r}
+ggplot(all_spots, aes(x = new_lat, y = stock_value_10km_2.5)) +
+  geom_point()
+```
+
