@@ -88,12 +88,22 @@ seq_value <- function(annual_seq, r, num_years){
 }
 ```
 
-# Calculating sequestration value for each surf
+# Calculating sequestration value for each surf spot
 
 ```{r}
 all_spots <- all_spots %>% 
   mutate(seq_value_2050_2.5_10km = seq_value(annual_seq_10km, 0.025, 27)) %>% 
   mutate(seq_value_2050_3_10km = seq_value(annual_seq_10km, 0.03, 27)) %>% 
-  mutate(seq_value_2050_5_10km = seq_value(annual_seq_10km, 0.05, 27))
+  mutate(seq_value_2050_5_10km = seq_value(annual_seq_10km, 0.05, 27)) %>% 
+  mutate(seq_value_2050_2.5_1km = seq_value(annual_seq_1km, 0.025, 27)) %>% 
+  mutate(seq_value_2050_3_1km = seq_value(annual_seq_1km, 0.03, 27)) %>% 
+  mutate(seq_value_2050_5_1km = seq_value(annual_seq_1km, 0.05, 27))
+ws_plus_sl <- ws_plus_sl %>% 
+  mutate(seq_value_2050_2.5_10km = seq_value(annual_seq_10km, 0.025, 27)) %>% 
+  mutate(seq_value_2050_3_10km = seq_value(annual_seq_10km, 0.03, 27)) %>% 
+  mutate(seq_value_2050_5_10km = seq_value(annual_seq_10km, 0.05, 27)) %>% 
+  mutate(seq_value_2050_2.5_1km = seq_value(annual_seq_1km, 0.025, 27)) %>% 
+  mutate(seq_value_2050_3_1km = seq_value(annual_seq_1km, 0.03, 27)) %>% 
+  mutate(seq_value_2050_5_1km = seq_value(annual_seq_1km, 0.05, 27))
 ```
 
