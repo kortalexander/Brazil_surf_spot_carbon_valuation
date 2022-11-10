@@ -5,6 +5,8 @@ date: "2022-11-08"
 output: html_document
 ---
 
+# Setup
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -13,6 +15,8 @@ library(here)
 library(janitor)
 ```
 
+# Data input
+
 ```{r}
 all_spots <- read_csv(here("data", "all_spots.csv")) %>% 
   clean_names()
@@ -20,13 +24,76 @@ ws_plus_sl <- read_csv(here("data", "ws_plus_sl.csv")) %>%
   clean_names()
 ```
 
+# Initial stock valuations
+
+SCC values for 2023 from https://19january2017snapshot.epa.gov/climatechange/social-cost-carbon-technical-documentation_.html 
+
 ```{r}
-SCC_2.5 <- 65
-SCC_3 <- 44
-SCC_5 <- 13
+SCC_2.5_2023 <- 65
+SCC_3_2023 <- 44
+SCC_5_2023 <- 13
 all_spots <- all_spots %>% 
-  mutate(initial_value_10km_2.5 = sum_10km * SCC_2.5) %>% 
-  mutate(initial_value_10km_3 = sum_10km * SCC_3) %>% 
-  mutate(initial_value_10km_5 = sum_10km * SCC_5)
+  mutate(stock_value_10km_2.5 = sum_10km * SCC_2.5_2023) %>% 
+  mutate(stock_value_10km_3 = sum_10km * SCC_3_2023) %>% 
+  mutate(stock_value_10km_5 = sum_10km * SCC_5_2023) %>% 
+  mutate(stock_value_1km_2.5 = sum_1km * SCC_2.5_2023) %>% 
+  mutate(stock_value_1km_3 = sum_1km * SCC_3_2023) %>% 
+  mutate(stock_value_1km_5 = sum_1km * SCC_5_2023)
+ws_plus_sl <- ws_plus_sl %>% 
+  mutate(stock_value_10km_2.5 = sum_10km * SCC_2.5_2023) %>% 
+  mutate(stock_value_10km_3 = sum_10km * SCC_3_2023) %>% 
+  mutate(stock_value_10km_5 = sum_10km * SCC_5_2023) %>% 
+  mutate(stock_value_1km_2.5 = sum_1km * SCC_2.5_2023) %>% 
+  mutate(stock_value_1km_3 = sum_1km * SCC_3_2023) %>% 
+  mutate(stock_value_1km_5 = sum_1km * SCC_5_2023)
+```
+
+# Amount of carbon sequestered out to 2050
+
+Annual sequestration will be equal to total sequestered carbon by 2050 divided by 27 years because sequestration is linear
+
+```{r}
+all_spots <- all_spots %>% 
+  mutate(annual_seq_10km = sqtd_10km / 27) %>% 
+  mutate(annual_seq_1km = sqtd_1km / 27)
+ws_plus_sl <- ws_plus_sl %>% 
+  mutate(annual_seq_10km = sqtd_10km / 27) %>% 
+  mutate(annual_seq_1km = sqtd_1km / 27)
+```
+
+# Creating SCC table
+
+Values from https://19january2017snapshot.epa.gov/climatechange/social-cost-carbon-technical-documentation_.html
+
+```{r}
+SCC_table <- data.frame(SCC_2.5 = c(65, 66, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 92, 93, 94, 95),
+                        SCC_3 = c(44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 61, 62, 63, 64, 65, 66, 67, 68, 69),
+                        SCC_5 = c(13, 13, 14, 14, 15, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26))
+```
+
+# Sequestration value function
+
+```{r}
+seq_value <- function(annual_seq, r, num_years){
+  SCC_values <- case_when(r == 0.025 ~ SCC_table$SCC_2.5,
+                          r == 0.03 ~ SCC_table$SCC_3,
+                          r == 0.05 ~ SCC_table$SCC_5)
+  sum_values <- 0
+  for(i in 1:num_years)
+  {
+    value = (SCC_values[i] * annual_seq) / (1 + r)^i
+    sum_values <- sum_values + value
+  }
+  return(sum_values)
+}
+```
+
+# Calculating sequestration value for each surf
+
+```{r}
+all_spots <- all_spots %>% 
+  mutate(seq_value_2050_2.5_10km = seq_value(annual_seq_10km, 0.025, 27)) %>% 
+  mutate(seq_value_2050_3_10km = seq_value(annual_seq_10km, 0.03, 27)) %>% 
+  mutate(seq_value_2050_5_10km = seq_value(annual_seq_10km, 0.05, 27))
 ```
 
