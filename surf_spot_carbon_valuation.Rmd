@@ -127,7 +127,9 @@ ws_plus_sl <- ws_plus_sl %>%
 # Plots
 
 ```{r}
-ggplot(all_spots, aes(x = new_lat, y = stock_value_10km_2.5)) +
-  geom_point()
+ggplot(all_spots, aes(x = ))
+ggplot(all_spots, aes(x = new_lat, y = sum_)) +
+  geom_point() +
+  geom_smooth(method = "lm")
 ```
 
