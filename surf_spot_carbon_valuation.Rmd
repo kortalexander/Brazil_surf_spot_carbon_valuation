@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(janitor)
+library(broom)
 ```
 
 # Data input
@@ -127,9 +128,14 @@ ws_plus_sl <- ws_plus_sl %>%
 # Plots
 
 ```{r}
-ggplot(all_spots, aes(x = ))
-ggplot(all_spots, aes(x = new_lat, y = sum_)) +
+ggplot(all_spots, aes(x = new_lat, y = sum_10km)) +
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  labs(x = "Latitude (degrees)", y = "Carbon stored in mangrove (tonnes)", caption = "") +
+  theme_minimal()
+ggplot(all_spots, aes(x = sum_10km)) +
+  geom_histogram() +
+  theme_minimal() +
+  labs(x = "Carbon stored in mangrove (tonnes)", y = "Count")
 ```
 
